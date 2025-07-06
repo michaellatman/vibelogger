@@ -26,7 +26,7 @@ VibeLogger is a zero-friction logging system that captures terminal output and b
 
 ## Chrome Extension Specifics
 - Users configure allowed sites via popup menu
-- Each site can have a custom tag (e.g., "staging frontend")
+- Each site can have a custom log name (e.g., "staging_frontend")
 - Console methods are patched to capture logs
 - Logs are batched and sent every 500ms
 

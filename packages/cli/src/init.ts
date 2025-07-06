@@ -86,6 +86,6 @@ export async function init() {
   console.log(chalk.green('\n✅ VibeLogger MCP server installed successfully!'));
   console.log(chalk.gray('\nUsage:'));
   console.log(chalk.gray('  vibelog <command>           - Run a command with logging'));
-  console.log(chalk.gray('  vibelog -t tag1,tag2 <cmd>  - Run with tags'));
+  console.log(chalk.gray('  vibelog -n name <command>   - Run with custom log name'));
   console.log(chalk.gray('  vibelog serve               - Start the server manually'));
 }

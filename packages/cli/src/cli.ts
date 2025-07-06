@@ -16,7 +16,7 @@ program
 // Default command - wrap a command
 program
   .arguments('<command...>')
-  .option('-t, --tags <tags>', 'comma-separated tags', '')
+  .option('-n, --name <name>', 'log file name', '')
   .option('--no-stdin', 'disable stdin capture')
   .action((command, options) => {
     spawn(command, options);

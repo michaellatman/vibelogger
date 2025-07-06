@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { Readable } from 'stream';
 import { PATHS, LogRecord, sanitizeName } from '@vibelogger/shared';
 import { appendLog, logIndex } from '../storage.js';
+import { notificationManager } from '../notifications.js';
 
 export function setupIngestRoute(fastify: FastifyInstance): void {
   fastify.post(`${PATHS.INGEST}/:name`, async (request, reply) => {
@@ -20,10 +21,14 @@ export function setupIngestRoute(fastify: FastifyInstance): void {
 
       // Update line count in index
       const resource = logIndex.get(name);
+      let isNewResource = false;
+      
       if (resource) {
         resource.props.line_count += lineCount;
+        resource.props.last_ts = new Date().toISOString();
       } else {
         // Create new resource if it doesn't exist
+        isNewResource = true;
         logIndex.set(name, {
           id: name,
           uri: `log://${name}`,
@@ -34,9 +39,15 @@ export function setupIngestRoute(fastify: FastifyInstance): void {
             last_ts: new Date().toISOString(),
             line_count: lineCount,
             size_bytes: body.length,
-            tags: [],
           },
         });
+      }
+
+      // Send notifications
+      if (isNewResource) {
+        notificationManager.notifyResourcesListChanged();
+      } else {
+        notificationManager.notifyResourceUpdated(`log://${name}`);
       }
 
       reply.code(204).send();

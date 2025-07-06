@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'log') {
-    const { data, tag } = request as { data: ChromeMessage; tag: string };
+    const { data, name } = request as { data: ChromeMessage; name: string };
     
     console.log('[VibeLogger Background] Processing log:', data.type, data.level);
     
@@ -99,13 +99,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       level: data.level as 'log' | 'info' | 'warn' | 'error' | 'debug',
       message: data.args?.join(' ') || data.error || '',
       url: data.url,
-      tags: [tag || 'unknown'],
     };
     
     console.log('[VibeLogger Background] Adding to batch:', record);
     
     // Add to batch
-    addToBatch(tag || 'unknown', record);
+    addToBatch(name || 'unknown', record);
     
     sendResponse({ success: true });
   }
@@ -256,10 +255,9 @@ chrome.webRequest.onCompleted.addListener(
           level: 'info',
           message: `[Network] ${details.method} ${details.url} - ${details.statusCode}`,
           url: details.url,
-          tags: [site.tag || site.domain],
         };
         
-        addToBatch(site.tag || site.domain, record);
+        addToBatch(site.name || site.domain, record);
       }
     });
   },

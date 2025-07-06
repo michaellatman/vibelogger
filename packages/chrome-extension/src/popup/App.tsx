@@ -59,9 +59,9 @@ export function App() {
     chrome.storage.sync.set({ allowedSites: updatedSites });
   };
 
-  const updateSiteTag = (domain: string, tag: string) => {
+  const updateSiteName = (domain: string, name: string) => {
     const updatedSites = sites.map(site =>
-      site.domain === domain ? { ...site, tag: sanitizeName(tag) } : site
+      site.domain === domain ? { ...site, name: sanitizeName(name) } : site
     );
     setSites(updatedSites);
     chrome.storage.sync.set({ allowedSites: updatedSites });
@@ -73,7 +73,7 @@ export function App() {
     const newSite: AllowedSite = {
       domain: newSitePattern,
       enabled: true,
-      tag: sanitizeName(newSiteLogName),
+      name: sanitizeName(newSiteLogName),
     };
     
     const updatedSites = [...sites, newSite];
@@ -138,7 +138,7 @@ export function App() {
             <span></span>
           </div>
           {sites.map(site => {
-            const logFileName = `${site.tag || sanitizeName(site.domain)}.ndjson`;
+            const logFileName = `${site.name || sanitizeName(site.domain)}.ndjson`;
             return (
               <div key={site.domain} className="site-item">
                 <div className="site-pattern" title={site.domain}>
@@ -148,8 +148,8 @@ export function App() {
                   <input
                     type="text"
                     className="site-tag-input"
-                    value={site.tag || ''}
-                    onChange={(e) => updateSiteTag(site.domain, e.target.value)}
+                    value={site.name || ''}
+                    onChange={(e) => updateSiteName(site.domain, e.target.value)}
                     placeholder={sanitizeName(site.domain)}
                   />
                   <span className="log-file-ext">.ndjson</span>

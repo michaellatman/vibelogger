@@ -14,14 +14,13 @@ import {
 } from '@vibelogger/shared';
 
 interface WrapperOptions {
-  tags?: string;
+  name?: string;
   stdin?: boolean;
 }
 
 export async function spawn(command: string[], options: WrapperOptions) {
   const cmdName = path.basename(command[0]);
-  const tags = options.tags ? options.tags.split(',').map(t => t.trim()) : [];
-  const name = tags[0] || cmdName;
+  const name = options.name || cmdName;
   const sanitizedName = sanitizeName(name);
   
   // Check if server is running
@@ -53,7 +52,7 @@ export async function spawn(command: string[], options: WrapperOptions) {
   });
   
   // Stream logs to server
-  const streamPromise = streamToServer(sanitizedName, tags);
+  const streamPromise = streamToServer(sanitizedName);
   const { enqueue, close } = await streamPromise;
   
   // Forward output to terminal and capture for logging
@@ -64,7 +63,6 @@ export async function spawn(command: string[], options: WrapperOptions) {
       ts: Date.now(),
       stream: 'stdout',
       data: encodeBase64(data),
-      tags,
     };
     
     enqueue(record);
@@ -80,7 +78,6 @@ export async function spawn(command: string[], options: WrapperOptions) {
         ts: Date.now(),
         stream: 'stdin',
         data: encodeBase64(data.toString()),
-        tags,
       };
       
       enqueue(record);
@@ -93,7 +90,6 @@ export async function spawn(command: string[], options: WrapperOptions) {
       ts: Date.now(),
       event: 'exit',
       code: exitCode || 0,
-      tags,
     };
     
     enqueue(record);
@@ -132,7 +128,7 @@ async function startServer() {
   }).unref();
 }
 
-async function streamToServer(name: string, tags: string[]) {
+async function streamToServer(name: string) {
   const chunks: string[] = [];
   let isStreaming = true;
   
@@ -156,7 +152,7 @@ async function streamToServer(name: string, tags: string[]) {
           }
         } catch (err) {
           console.error(chalk.red('Failed to send logs. Buffering...'), err);
-          await bufferLogs(name, tags);
+          await bufferLogs(name);
         }
       }
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -176,7 +172,7 @@ async function streamToServer(name: string, tags: string[]) {
   };
 }
 
-async function bufferLogs(name: string, tags: string[]) {
+async function bufferLogs(name: string) {
   const cacheDir = path.join(homedir(), '.cache', 'vibelog');
   await fs.mkdir(cacheDir, { recursive: true });
   

@@ -4,7 +4,6 @@ export interface LogRecord {
   data?: string;
   event?: 'exit' | 'error';
   code?: number;
-  tags?: string[];
   level?: 'log' | 'info' | 'warn' | 'error' | 'debug';
   url?: string;
   message?: string;
@@ -20,7 +19,6 @@ export interface LogResource {
     last_ts: string;
     line_count: number;
     size_bytes: number;
-    tags?: string[];
     secs_since_activity?: number;
   };
 }
@@ -36,7 +34,7 @@ export interface GetLogOptions {
 export interface AllowedSite {
   domain: string;
   enabled: boolean;
-  tag?: string;
+  name?: string;
 }
 
 export type LogLevel = 'none' | 'minimal' | 'verbose';

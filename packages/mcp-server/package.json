@@ -18,10 +18,12 @@
     "@vibelogger/shared": "workspace:*",
     "fastify": "^4.26.0",
     "fast-glob": "^3.3.2",
-    "pino-pretty": "^10.3.0"
+    "pino-pretty": "^10.3.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0"

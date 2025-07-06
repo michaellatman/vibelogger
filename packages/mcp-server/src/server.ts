@@ -4,6 +4,7 @@ import { SERVER_HOST, SERVER_PORT, PATHS } from '@vibelogger/shared';
 import { setupRoutes } from './routes.js';
 import { initializeStorage, startPurgeScheduler } from './storage.js';
 import { logger } from './logger.js';
+import { notificationManager } from './notifications.js';
 
 const fastify = Fastify({
   logger: logger,
@@ -34,6 +35,9 @@ async function start() {
 
     // Start server
     await fastify.listen({ port: SERVER_PORT, host: SERVER_HOST });
+    
+    // Initialize notification WebSocket server
+    notificationManager.initialize(fastify.server);
     
     console.log(`VibeLogger MCP server listening on ${SERVER_HOST}:${SERVER_PORT}`);
   } catch (err) {

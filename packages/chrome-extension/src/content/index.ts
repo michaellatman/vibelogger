@@ -1,7 +1,7 @@
 import { ChromeMessage, AllowedSite, LogLevel, ExtensionSettings } from '@vibelogger/shared';
 
 let isEnabled = false;
-let currentTag = '';
+let currentName = '';
 let logLevel: LogLevel = 'none';
 
 // Check if current site is allowed
@@ -30,9 +30,9 @@ async function checkSiteStatus() {
         
         if (site && site.enabled) {
           isEnabled = true;
-          currentTag = site.tag || tabHostname;
+          currentName = site.name || tabHostname;
           if (logLevel === 'verbose') {
-            console.log(`[VibeLogger] Tab ${tabHostname} is allowlisted with tag: ${currentTag}`);
+            console.log(`[VibeLogger] Tab ${tabHostname} is allowlisted with name: ${currentName}`);
           }
           resolve(true);
         } else {
@@ -102,7 +102,7 @@ function setupMessageListener() {
       chrome.runtime.sendMessage({
         action: 'log',
         data: message,
-        tag: currentTag,
+        name: currentName,
       }, (response) => {
         if (chrome.runtime.lastError && logLevel === 'verbose') {
           console.error('[VibeLogger] Error sending log:', chrome.runtime.lastError);

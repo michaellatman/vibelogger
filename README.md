@@ -38,6 +38,10 @@ vibelog npm test
 vibelog python script.py
 vibelog curl https://api.example.com
 
+# Log with custom name
+vibelog -n build_logs npm run build
+vibelog -n api_tests curl https://api.example.com
+
 # Open logs directory
 vibelog open
 ```

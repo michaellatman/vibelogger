@@ -28,7 +28,12 @@ export function setupMCPRoutes(fastify: FastifyInstance): void {
           result = {
             protocolVersion: '2024-11-05',
             capabilities: {
-              resources: { list: true, read: true },
+              resources: { 
+                list: true, 
+                read: true,
+                subscribe: false,
+                listChanged: true
+              },
               tools: { list: true },
             },
             serverInfo: {
