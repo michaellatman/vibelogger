@@ -1,0 +1,49 @@
+{
+  "name": "@michaellatman/vibelog",
+  "version": "1.0.0",
+  "description": "Zero-friction logging system for terminal and browser console logs",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "vibelog": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaellatman/vibelogger.git"
+  },
+  "keywords": [
+    "logging",
+    "terminal",
+    "console",
+    "mcp",
+    "claude"
+  ],
+  "author": "Michael Latman",
+  "homepage": "https://github.com/michaellatman/vibelogger#readme",
+  "bugs": {
+    "url": "https://github.com/michaellatman/vibelogger/issues"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@vibelogger/shared": "workspace:*",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "node-fetch": "^3.3.2",
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}

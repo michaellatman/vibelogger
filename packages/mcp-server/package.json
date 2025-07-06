@@ -1,0 +1,29 @@
+{
+  "name": "@vibelogger/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for VibeLogger",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/cors": "^9.0.0",
+    "@vibelogger/shared": "workspace:*",
+    "fastify": "^4.26.0",
+    "fast-glob": "^3.3.2",
+    "pino-pretty": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "VibeLogger",
+  "version": "1.0.0",
+  "description": "Capture console logs and network events for development",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/index.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["content/page-script.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

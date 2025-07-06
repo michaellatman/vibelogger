@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeLogger Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error-btn {
+            background: #dc3545;
+        }
+        .error-btn:hover {
+            background: #c82333;
+        }
+        .warn-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        .warn-btn:hover {
+            background: #e0a800;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #495057;
+            font-size: 18px;
+        }
+        .output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .iframe-container {
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VibeLogger Test Page</h1>
+        <p class="subtitle">Test console logging capture for VibeLogger Chrome Extension</p>
+        
+        <div class="section">
+            <h2>Basic Console Methods</h2>
+            <button onclick="testLog()">console.log()</button>
+            <button onclick="testInfo()">console.info()</button>
+            <button class="warn-btn" onclick="testWarn()">console.warn()</button>
+            <button class="error-btn" onclick="testError()">console.error()</button>
+            <button onclick="testDebug()">console.debug()</button>
+        </div>
+
+        <div class="section">
+            <h2>Complex Logging Tests</h2>
+            <button onclick="testObject()">Log Object</button>
+            <button onclick="testArray()">Log Array</button>
+            <button onclick="testMultipleArgs()">Multiple Arguments</button>
+            <button onclick="testNested()">Nested Object</button>
+            <button onclick="testLongMessage()">Long Message</button>
+        </div>
+
+        <div class="section">
+            <h2>Timing Tests</h2>
+            <button onclick="testImmediate()">Immediate Logs</button>
+            <button onclick="testDelayed()">Delayed Logs (2s)</button>
+            <button onclick="testRapidFire()">Rapid Fire (100 logs)</button>
+            <button onclick="testInterval()">Start Interval Logging</button>
+            <button onclick="stopInterval()">Stop Interval</button>
+        </div>
+
+        <div class="section">
+            <h2>Error Handling Tests</h2>
+            <button class="error-btn" onclick="throwError()">Throw Error</button>
+            <button class="error-btn" onclick="testPromiseRejection()">Promise Rejection</button>
+            <button onclick="testStackTrace()">Log Stack Trace</button>
+        </div>
+
+        <div class="section">
+            <h2>iFrame Test</h2>
+            <p>This iframe should also have its console logs captured:</p>
+            <div class="iframe-container">
+                <iframe id="testFrame" srcdoc='
+                    <html>
+                    <body style="font-family: sans-serif; padding: 20px;">
+                        <h3>iFrame Console Test</h3>
+                        <button onclick="console.log(&quot;Log from iframe:&quot;, new Date().toISOString())">
+                            Log from iFrame
+                        </button>
+                        <button onclick="console.error(&quot;Error from iframe!&quot;)">
+                            Error from iFrame
+                        </button>
+                        <script>
+                            console.log("iFrame loaded at", new Date().toISOString());
+                        </script>
+                    </body>
+                    </html>
+                '></iframe>
+            </div>
+        </div>
+
+        <div class="output" id="output">
+            <div>Console output will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        // Track console output locally
+        const output = document.getElementById('output');
+        let intervalId = null;
+        
+        function addOutput(type, ...args) {
+            const timestamp = new Date().toISOString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const line = document.createElement('div');
+            line.style.color = type === 'error' ? '#f44' : type === 'warn' ? '#fa0' : '#0f0';
+            line.textContent = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Override console methods to show output
+        const originalConsole = {
+            log: console.log,
+            info: console.info,
+            warn: console.warn,
+            error: console.error,
+            debug: console.debug
+        };
+
+        ['log', 'info', 'warn', 'error', 'debug'].forEach(method => {
+            const original = console[method];
+            console[method] = function(...args) {
+                original.apply(console, args);
+                addOutput(method, ...args);
+            };
+        });
+
+        // Test functions
+        function testLog() {
+            console.log('Basic log message at', new Date().toISOString());
+        }
+
+        function testInfo() {
+            console.info('Information message with timestamp:', Date.now());
+        }
+
+        function testWarn() {
+            console.warn('Warning! This is a test warning message');
+        }
+
+        function testError() {
+            console.error('Error! This is a test error message');
+        }
+
+        function testDebug() {
+            console.debug('Debug message - detailed information');
+        }
+
+        function testObject() {
+            console.log('Object test:', {
+                name: 'VibeLogger Test',
+                version: '1.0.0',
+                timestamp: new Date(),
+                features: ['console', 'network', 'errors']
+            });
+        }
+
+        function testArray() {
+            console.log('Array test:', [1, 'two', { three: 3 }, [4, 5, 6], true]);
+        }
+
+        function testMultipleArgs() {
+            console.log('Multiple', 'arguments', 'test:', 123, { key: 'value' }, [1, 2, 3]);
+        }
+
+        function testNested() {
+            const nested = {
+                level1: {
+                    level2: {
+                        level3: {
+                            deep: 'value',
+                            array: [1, 2, { nested: true }]
+                        }
+                    },
+                    timestamp: new Date()
+                }
+            };
+            console.log('Deeply nested object:', nested);
+        }
+
+        function testLongMessage() {
+            const longText = 'Lorem ipsum dolor sit amet, '.repeat(50);
+            console.log('Long message test:', longText);
+        }
+
+        function testImmediate() {
+            console.log('Immediate 1');
+            console.log('Immediate 2');
+            console.log('Immediate 3');
+            console.info('Immediate info');
+            console.warn('Immediate warning');
+            console.error('Immediate error');
+        }
+
+        function testDelayed() {
+            console.log('Delayed test started, will log in 2 seconds...');
+            setTimeout(() => {
+                console.log('Delayed log after 2 seconds');
+                console.info('Delayed info after 2 seconds');
+                console.warn('Delayed warning after 2 seconds');
+                console.error('Delayed error after 2 seconds');
+            }, 2000);
+        }
+
+        function testRapidFire() {
+            console.log('Starting rapid fire test - 100 logs...');
+            for (let i = 0; i < 100; i++) {
+                console.log(`Rapid fire log #${i + 1}`);
+            }
+            console.log('Rapid fire test complete!');
+        }
+
+        function testInterval() {
+            if (intervalId) {
+                console.warn('Interval already running!');
+                return;
+            }
+            let count = 0;
+            console.log('Starting interval logging (every 1 second)...');
+            intervalId = setInterval(() => {
+                count++;
+                console.log(`Interval log #${count} at ${new Date().toISOString()}`);
+            }, 1000);
+        }
+
+        function stopInterval() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+                console.log('Interval logging stopped');
+            } else {
+                console.warn('No interval running');
+            }
+        }
+
+        function throwError() {
+            console.log('About to throw an error...');
+            throw new Error('This is a test error thrown on purpose!');
+        }
+
+        function testPromiseRejection() {
+            console.log('Creating rejected promise...');
+            Promise.reject('Unhandled promise rejection test').then(() => {
+                // This won't run
+            });
+        }
+
+        function testStackTrace() {
+            console.trace('Stack trace test');
+        }
+
+        // Log on page load
+        console.log('VibeLogger test page loaded at', new Date().toISOString());
+        console.info('Ready for testing! Click buttons to generate console logs.');
+    </script>
+</body>
+</html>
