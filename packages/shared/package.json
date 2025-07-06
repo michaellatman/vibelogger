@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "tsc -b -w",
+    "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "license": "MIT",

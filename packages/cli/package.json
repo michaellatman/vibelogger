@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc -b && chmod +x dist/cli.js",
     "dev": "tsx src/cli.ts",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
