@@ -65,3 +65,7 @@ export function getLogDirectory(): string {
     return `${homedir}/.local/state/vibelog/logs`;
   }
 }
+
+export function getServerLockPath(): string {
+  return `${getLogDirectory()}/server.lock`;
+}

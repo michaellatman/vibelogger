@@ -5,13 +5,18 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { homedir } from 'os';
 import chalk from 'chalk';
-import { 
-  SERVER_URL, 
-  PATHS, 
-  LogRecord, 
+import {
+  SERVER_URL,
+  PATHS,
+  LogRecord,
   encodeBase64,
-  sanitizeName
+  sanitizeName,
+  getServerLockPath
 } from '@vibelogger/shared';
+
+let isLeader = false;
+const lockPath = getServerLockPath();
+let leaderInterval: NodeJS.Timeout | null = null;
 
 interface WrapperOptions {
   name?: string;
@@ -22,16 +27,9 @@ export async function spawn(command: string[], options: WrapperOptions) {
   const cmdName = path.basename(command[0]);
   const name = options.name || cmdName;
   const sanitizedName = sanitizeName(name);
-  
-  // Check if server is running
-  const serverRunning = await checkServer();
-  if (!serverRunning) {
-    console.log(chalk.yellow('VibeLogger server not running. Starting...'));
-    await startServer();
-    // Wait a moment for server to start
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-  
+
+  await ensureServerLeadership();
+
   console.log(chalk.gray(`[VibeLogger] Starting: ${command.join(' ')} with name: ${sanitizedName}`));
   
   // Create PTY instance
@@ -153,6 +151,7 @@ async function streamToServer(name: string) {
         } catch (err) {
           console.error(chalk.red('Failed to send logs. Buffering...'), err);
           await bufferLogs(name);
+          await ensureServerLeadership();
         }
       }
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -179,4 +178,70 @@ async function bufferLogs(name: string) {
   const bufferFile = path.join(cacheDir, `${name}.buffer`);
   // Implementation for buffering would go here
   console.log(chalk.yellow(`Logs will be buffered to ${bufferFile}`));
+}
+
+async function acquireLock(): Promise<boolean> {
+  try {
+    await fs.writeFile(lockPath, process.pid.toString(), { flag: 'wx' });
+    return true;
+  } catch (err: any) {
+    if (err.code === 'EEXIST') {
+      try {
+        const pidStr = await fs.readFile(lockPath, 'utf8');
+        const pid = parseInt(pidStr, 10);
+        process.kill(pid, 0);
+        return false;
+      } catch (e: any) {
+        if (e.code === 'ESRCH' || e.code === 'ENOENT') {
+          await fs.writeFile(lockPath, process.pid.toString(), { flag: 'w' });
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}
+
+async function releaseLock() {
+  try {
+    await fs.unlink(lockPath);
+  } catch {}
+}
+
+async function ensureServerLeadership() {
+  const running = await checkServer();
+  if (!running) {
+    if (!isLeader) {
+      isLeader = await acquireLock();
+    }
+    if (isLeader) {
+      console.log(chalk.yellow('Starting VibeLogger server...'));
+      await startServer();
+    }
+  }
+
+  if (!leaderInterval) {
+    leaderInterval = setInterval(async () => {
+      const alive = await checkServer();
+      if (!alive) {
+        if (!isLeader) {
+          isLeader = await acquireLock();
+        }
+        if (isLeader) {
+          console.log(chalk.yellow('Restarting VibeLogger server...'));
+          await startServer();
+        }
+      }
+    }, 5000);
+
+    const cleanup = async () => {
+      if (isLeader) {
+        await releaseLock();
+      }
+    };
+
+    process.on('exit', cleanup);
+    process.on('SIGINT', () => { cleanup().then(() => process.exit(0)); });
+    process.on('SIGTERM', () => { cleanup().then(() => process.exit(0)); });
+  }
 }
