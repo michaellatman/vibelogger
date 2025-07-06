@@ -4,6 +4,8 @@ Zero-friction logging system that captures terminal output and browser console l
 
 ## Quick Start
 
+**Note:** The VibeLogger package has not been published to npm yet.
+
 ### Install the CLI
 
 ```bash
