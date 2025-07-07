@@ -1,4 +1,4 @@
-import { ChromeMessage, LogRecord, SERVER_URL, PATHS, BATCH_INTERVAL_MS, encodeBase64 } from '@vibelogger/shared';
+import { ChromeMessage, LogRecord, SERVER_URL, PATHS, BATCH_INTERVAL_MS, encodeBase64, AllowedSite } from '@vibelogger/shared';
 
 interface LogBatch {
   name: string;
