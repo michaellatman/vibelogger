@@ -7,7 +7,7 @@
     "dev": "vite build --watch",
     "build": "vite build",
     "test": "vitest --passWithNoTests",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -b"
   },
   "license": "MIT",
   "dependencies": {
@@ -19,6 +19,8 @@
     "@vitejs/plugin-react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "sharp": "^0.34.2",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",

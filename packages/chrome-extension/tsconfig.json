@@ -6,7 +6,7 @@
     "composite": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "types": ["chrome"]
+    "types": ["chrome", "react", "react-dom"]
   },
   "include": ["src/**/*"],
   "references": [
